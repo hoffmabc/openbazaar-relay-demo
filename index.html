@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="bundle.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/new-age.min.css" />
+  </head>
+  <body id="page-top">
+
+    <header class="masthead">
+      <div class="container h-100">
+        <div class="row h-100">
+          <div class="col-lg-7 my-auto">
+            <div class="header-content mx-auto">
+              <h1 class="mb-5">OpenBazaar Web Relay Demo</h1>
+              <p>Send a chat message to anyone on OpenBazaar from the web!</p>
+            </div>
+          </div>
+          <div class="col-lg-5 my-auto">
+            <div class="device-container">
+              <div class="device-mockup iphone6_plus portrait white">
+                <div class="device">
+                  <div class="screen">
+                    <table class="table">
+                      <tr>
+                        <td>Subscription Key:</td>
+                        <td><span id="subkey"></span></td>
+                      </tr>
+                      <tr>
+                        <td>Peer ID:</td>
+                        <td><span id="peerid"></span></td>
+                      </tr>
+                      <tr>
+                        <td>Mnemonic:</td>
+                        <td><span id="mnemonic"></span></td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="button">
+                    <!-- You can hook the "home button" to some JavaScript events or just remove it -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+
+
+      <form action="javascript:void(0);" onsubmit="sendMessage(this.peerID.value, this.message.value);">
+        <h2>Send a Message</h2>
+        <div class="form-group">
+          <label>Recipient Peer ID:</label>
+          <input type="text" name="peerID" class="form-control" value="" size="100"/>
+        </div>
+        <div class="form-group">
+          <label>Message:</label><br/>
+          <textarea name="message" class="form-control" rows="10" cols="60"></textarea>
+        </div>
+        <div class="form-group">
+          <input type="submit" class="btn btn-default" value="Send Message"/>
+        </div>
+
+      </form>
+
+
+    </div>
+
+    <script>
+
+    var subkey = getSubKey("QmNU2H1S1gNf782s9gvFFV9jUKBSy7uuWU8QtAA2N3bhFZ");
+    document.getElementById('subkey').innerHTML = subkey;
+
+    var updatePeerInfo = (peer) => {
+      document.getElementById('peerid').innerHTML = peer.peerid;
+      document.getElementById('mnemonic').innerHTML = peer.mnemonic;
+    }
+
+    generatePeerID(updatePeerInfo);
+
+    function sendMsg(peerid, msg) {
+      sendMessage('QmNU2H1S1gNf782s9gvFFV9jUKBSy7uuWU8QtAA2N3bhFZ', 'test');
+    }
+
+    </script>
+
+
+  </body>
+
+</html>
