@@ -15,7 +15,6 @@ const PeerId = require('peer-id')
 
 var identity_key = "";
 var relay_server = "ws://174.138.10.116:8080";
-//var mnemonic = "common duty fluid step script olympic over right slam rely senior junior";
 var mnemonic = "";  // You can use this from your other OpenBazaar install backup or leave empty
 var subscription_key = "";
 
