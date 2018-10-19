@@ -18,6 +18,8 @@ var relay_server = "wss://webchat.ob1.io:8080";
 var mnemonic = "";  // You can use this from your other OpenBazaar install backup or leave empty
 var subscription_key = "";
 
+var ws = "";
+
 function get_encoded_ciphertext(plaintext, pubkey) {
   var ephem_keypair = nacl.box.keyPair(); // Generate ephemeral key
   var pubkeyCurve = ed2curve.convertPublicKey(pubkey._key); // Convert to curve25519 pubkey
@@ -187,17 +189,18 @@ window.getSubKey = (peerID) => {
 window.sendMessage = function sendMessage(peerid, message) {
 
   generateMessageEnvelope(peerid, message, (envelope) => {
-
-    const ws = new WebSocket(relay_server);
-
-    ws.onopen = () => {
-      // Send Auth
-      ws.send('{"UserID":"'+peerid+'","SubscriptionKey":"'+subscription_key+'"}');
-
+    console.log(ws);
+    if(!ws) {
+      ws = new WebSocket(relay_server);
+      ws.onopen = () => {
+        // Send Auth
+        ws.send('{"UserID":"'+peerid+'","SubscriptionKey":"'+subscription_key+'"}');
+        ws.send('{"recipient":"'+peerid+'","encryptedMessage":"'+envelope+'"}')
+      };
+    } else {
       // Send Message
       ws.send('{"recipient":"'+peerid+'","encryptedMessage":"'+envelope+'"}')
-
-    };
+    }
 
     ws.onmessage = (data) => {
       console.log(data);
