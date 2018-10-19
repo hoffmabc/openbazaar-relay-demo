@@ -14,8 +14,8 @@ const PeerId = require('peer-id')
 
 
 var identity_key = "";
-var relay_server = "wss://webchat.ob1.io:8080";
-var mnemonic = "";  // You can use this from your other OpenBazaar install backup or leave empty
+var relay_server = "ws://localhost:8081";
+var mnemonic = "curtain wrestle youth hurry alert surge circle position february spin inquiry clean";  // You can use this from your other OpenBazaar install backup or leave empty
 var subscription_key = "";
 
 var ws = "";
@@ -32,7 +32,7 @@ function get_encoded_ciphertext(plaintext, pubkey) {
 }
 
 function generateSubscriptionKey(peerID) {
-  console.log('Generate subscription key');
+  console.log('Generate subscription key for: '+peerID);
   var peerIDMultihash = multihashes.fromB58String(peerID);
   var decoded = multihashes.decode(peerIDMultihash);
   var digest = decoded.digest;
