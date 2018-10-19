@@ -73,10 +73,11 @@
 
     <script>
 
-    var subkey = getSubKey("QmNU2H1S1gNf782s9gvFFV9jUKBSy7uuWU8QtAA2N3bhFZ");
-    document.getElementById('subkey').innerHTML = subkey;
+
 
     var updatePeerInfo = (peer) => {
+      var subkey = getSubKey(peer.peerid);
+      document.getElementById('subkey').innerHTML = subkey;
       document.getElementById('peerid').innerHTML = peer.peerid;
       document.getElementById('mnemonic').innerHTML = peer.mnemonic;
     }
