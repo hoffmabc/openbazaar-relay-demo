@@ -15,7 +15,7 @@ const PeerId = require('peer-id')
 
 var identity_key = "";
 var relay_server = "ws://localhost:8081";
-var mnemonic = "curtain wrestle youth hurry alert surge circle position february spin inquiry clean";  // You can use this from your other OpenBazaar install backup or leave empty
+var mnemonic = "";  // You can use this from your other OpenBazaar install backup or leave empty
 var subscription_key = "";
 
 var ws = "";
@@ -36,10 +36,31 @@ function generateSubscriptionKey(peerID) {
   var peerIDMultihash = multihashes.fromB58String(peerID);
   var decoded = multihashes.decode(peerIDMultihash);
   var digest = decoded.digest;
-  var prefix = digest.slice(0,8);
-  BufferShift.shr(prefix, 48);
-  var checksum = crypto.createHash('sha256').update(prefix).digest("hex");
-  var subscriptionKey = multihashes.encode(Buffer.from(checksum,'hex'), 'sha2-256');
+  var prefix = new Buffer(new Uint8Array(digest.slice(0,8)));
+
+  var BitArray = require('node-bitarray')
+  var bits = BitArray.fromBuffer(prefix);
+  bits = bits.slice(0,14);
+  bits = new Buffer(bits);
+
+  for(var i=0; i<50;i++) {
+    bits = Buffer.concat([new Buffer([0]), bits]);
+  }
+
+  // Construct uint8array from binary strings
+  var id_array = [];
+  for(i=0; i<8; i++) {
+    var tmp_x = "";
+    for(j=0; j<8; j++) {
+      //console.log('bit', i*8+j, bits[i*8+j])
+      tmp_x += bits[i*8+j];
+    }
+    id_array.push(parseInt(tmp_x, 2));
+  }
+
+  var checksum = crypto.createHash('sha256').update(new Buffer(id_array)).digest();
+  var subscriptionKey = multihashes.encode(Buffer.from(checksum), 'sha2-256');
+  console.log('Subscription Key:', bs58.encode(subscriptionKey));
   return bs58.encode(subscriptionKey);
 }
 
