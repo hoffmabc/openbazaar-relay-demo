@@ -14,7 +14,7 @@ const PeerId = require('peer-id')
 
 
 var identity_key = "";
-var relay_server = "ws://localhost:8081";
+var relay_server = "wss://webchat.ob1.io:8080";
 var mnemonic = "";  // You can use this from your other OpenBazaar install backup or leave empty
 var subscription_key = "";
 
