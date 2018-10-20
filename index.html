@@ -53,29 +53,37 @@
 
 
       <form action="javascript:void(0);" onsubmit="sendMessage(this.peerID.value, this.message.value);">
-        <h2>Send a Message</h2>
+        <h2>Chat Room</h2>
+
         <div class="form-group">
-          <label>Recipient Peer ID:</label>
-          <input type="text" name="peerID" class="form-control" value="" size="100"/>
+          <input type="text" name="peerID" class="form-control" value="" size="100" placeholder="Enter Recipient Peer ID"/>
         </div>
+
         <div class="form-group">
-          <label>Message:</label><br/>
-          <textarea name="message" class="form-control" rows="10" cols="60"></textarea>
+        <div id="incoming_messages" style="border:1px solid #999;background-color:#efefef;height:300px;width:100%;overflow-y:scroll;"></div>
+      </div>
+
+
+        <div class="form-group">
+          <input id="message" type="text" name="message" class="form-control"></textarea>
         </div>
         <div class="form-group">
           <input type="submit" class="btn btn-default" value="Send Message"/>
         </div>
 
+
       </form>
+
 
 
     </div>
 
     <script>
 
-
+    decryptMessage();
 
     var updatePeerInfo = (peer) => {
+      //peer.peerid = "QmNU2H1S1gNf782s9gvFFV9jUKBSy7uuWU8QtAA2N3bhFZ";
       var subkey = getSubKey(peer.peerid);
       document.getElementById('subkey').innerHTML = subkey;
       document.getElementById('peerid').innerHTML = peer.peerid;

@@ -15,13 +15,18 @@ const PeerId = require('peer-id')
 
 var identity_key = "";
 var relay_server = "wss://webchat.ob1.io:8080";
-var mnemonic = "";  // You can use this from your other OpenBazaar install backup or leave empty
+var mnemonic = "primary then casual laugh glow climb correct maple unknown accuse scan spend";  // You can use this from your other OpenBazaar install backup or leave empty
 var subscription_key = "";
+var jsonDescriptor = require("./message.json");
+var ephem_keypair = "";
+var my_peer_id = "";
 
 var ws = "";
 
 function get_encoded_ciphertext(plaintext, pubkey) {
-  var ephem_keypair = nacl.box.keyPair(); // Generate ephemeral key
+  if(!ephem_keypair) {
+      ephem_keypair = nacl.box.keyPair(); // Generate ephemeral key
+  }
   var pubkeyCurve = ed2curve.convertPublicKey(pubkey._key); // Convert to curve25519 pubkey
   var nonce = new Uint8Array(crypto.randomBytes(24)); // 24 bit random nonce
   var ciphertext = nacl.box(plaintext, nonce, pubkeyCurve, ephem_keypair.secretKey); // Create ciphertext
@@ -29,6 +34,52 @@ function get_encoded_ciphertext(plaintext, pubkey) {
   var encoded_ciphertext = joint_ciphertext.toString('base64'); // Base 64 encode
   console.log('Encoded Envelope Ciphertext:', encoded_ciphertext.length, encoded_ciphertext);
   return encoded_ciphertext;
+}
+
+function openEncryptedMessage(message) {
+
+  // Decode the base64
+  var decoded_message = new Buffer(message, 'base64');
+
+  var nonce = decoded_message.slice(0,24);
+  var pubkey = decoded_message.slice(24,56);
+  var ciphertext = decoded_message.slice(56, decoded_message.length);
+
+  // Get encryption keys
+  var bip39seed = bip39.mnemonicToSeed(mnemonic, 'Secret Passphrase');
+  var hmac = sha256.hmac.create("OpenBazaar seed");
+  hmac.update(bip39seed);
+  var seed = new Uint8Array(hmac.array());
+
+  crypto2.keys.generateKeyPairFromSeed('ed25519', seed, (err, keypair)=>{
+
+    var privkey = ed2curve.convertSecretKey(keypair._key);
+
+    var out = nacl.box.open(ciphertext, nonce, pubkey, privkey);
+    if(!out) {
+      console.log("Could not decrypt message");
+    } else {
+      //console.log("Decrypted Ciphertext:", out);
+    }
+
+    var root = protobuf.Root.fromJSON(jsonDescriptor);
+    var Message = root.lookupType("Message");
+    var Chat = root.lookupType("Chat");
+    var Envelope = root.Envelope;
+
+    var incoming_message = Envelope.decode(out);
+
+    switch(incoming_message.message.messageType) {
+      case 1:
+        // chatmessage
+        var chatmessage = Chat.decode(incoming_message.message.payload.value);
+        console.log("Chat Message from xxxx:", chatmessage.message);
+        document.getElementById('incoming_messages').innerHTML += "[THEM] " + chatmessage.message + "<BR/>";
+        return chatmessage;
+    }
+
+  });
+
 }
 
 function generateSubscriptionKey(peerID) {
@@ -174,7 +225,6 @@ function generateMessageEnvelope(peerid, message, cb) {
       console.log("Identity Key:", identity_key);
 
       // Load Messages proto
-      var jsonDescriptor = require("./message.json");
       constructMessage(jsonDescriptor);
     }
   }
@@ -207,6 +257,10 @@ window.getSubKey = (peerID) => {
   return subscription_key;
 }
 
+window.decryptMessage = () => {
+  //openEncryptedMessage("test");
+}
+
 window.sendMessage = function sendMessage(peerid, message) {
 
   generateMessageEnvelope(peerid, message, (envelope) => {
@@ -224,10 +278,20 @@ window.sendMessage = function sendMessage(peerid, message) {
     }
 
     ws.onmessage = (data) => {
-      console.log(data);
+
+      var data = JSON.parse(data.data);
+
+      if(data.encryptedMessage) {
+        var msg = openEncryptedMessage(data.encryptedMessage);
+
+      }
+
     };
 
   });
+
+  document.getElementById('incoming_messages').innerHTML += "[ME] " + message + "<BR/>";
+  document.getElementById('message').value = '';
 }
 
 window.generatePeerID = (cb) => {
@@ -243,6 +307,7 @@ window.generatePeerID = (cb) => {
   crypto2.keys.generateKeyPairFromSeed('ed25519', seed, (err, keypair)=>{
     var peerid = PeerId.createFromPubKey(crypto2.keys.marshalPublicKey(keypair.public), (err, key)=>{
       console.log("Peer ID:", key._idB58String);
+      my_peer_id = key._idB58String;
       cb({
         "mnemonic": mnemonic,
         "peerid": key._idB58String
