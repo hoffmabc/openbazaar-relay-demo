@@ -15,7 +15,7 @@ const PeerId = require('peer-id')
 
 var identity_key = "";
 var relay_server = "wss://webchat.ob1.io:8080";
-var mnemonic = "primary then casual laugh glow climb correct maple unknown accuse scan spend";  // You can use this from your other OpenBazaar install backup or leave empty
+var mnemonic = "";  // You can use this from your other OpenBazaar install backup or leave empty
 var subscription_key = "";
 var jsonDescriptor = require("./message.json");
 var ephem_keypair = "";
