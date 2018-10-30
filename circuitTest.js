@@ -117,10 +117,6 @@ function getChatPayload(message) {
 /* Call these methods from the browser
 ****************/
 
-window.sendMessage = function sendMessage(peerid, message) {
-  pingDesktop(peerid, message);
-}
-
 window.generatePeerID = (cb) => {
   if(!mnemonic) {
     console.log("No mnemonic set...");
@@ -144,7 +140,7 @@ window.generatePeerID = (cb) => {
   });
 }
 
-window.pingDesktop = (peerid, message) => {
+window.sendMessage = (peerid, message) => {
 
   peer = "/p2p-circuit/ipfs/" + peerid;
 
@@ -194,20 +190,17 @@ window.pingDesktop = (peerid, message) => {
       var messageMessage = Message.create(message_payload);
       var serializedMessage = Message.encode(messageMessage).finish();
 
-      console.log("MESSAGE", serializedMessage);
-
       function sink (read) {
         console.log(this)
         read(null, function next (err, data) {
           if(err) return console.log(err)
           console.log("MY DATA",data)
-          //recursively call read again!
           read(null, next)
         })
       }
 
       pull(
-        pull.once(serializedMessage),        
+        pull.once(serializedMessage),
         conn
       )
 
