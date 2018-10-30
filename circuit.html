@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="bundleCircuit.js"></script>
+    <title>OpenBazaar Circuit Relay Demo</title>
+  </head>
+  <body>
+
+    <table>
+      <tr>
+        <td>Peer ID:</td>
+        <td><span id="peerid"></span></td>
+      </tr>-
+    </table>
+
+      <form action="javascript:void(0);" onsubmit="sendMessage(this.peerID.value, this.message.value);">
+        <h2>Send Chat Message</h2>
+
+        <div class="form-group">
+          <input type="text" name="peerID" value="" size="60" placeholder="Enter Recipient Peer ID"/>
+        </div>
+
+
+
+        <div class="form-group">
+          <input id="message" type="text" name="message" size="60" placeholder="Enter a message to send"></textarea>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Send Message"/>
+        </div>
+
+
+      </form>
+
+
+
+    </div>
+
+
+  </body>
+
+</html>
